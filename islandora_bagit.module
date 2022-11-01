@@ -776,7 +776,7 @@ function islandora_bagit_collection_batch_finished($success, $results, $operatio
     // Clean up session variables added by the collection-level batch.
     unset($_SESSION['islandora_bagit_tmp_ds_directory']);
     unset($_SESSION['islandora_bagit_collection_object_pid']);
-    unset($_SESSION['islandora_bagit_collection_object_unchanged_pid'])
+    unset($_SESSION['islandora_bagit_collection_object_unchanged_pid']);
     unset($_SESSION['islandora_bagit_all_added_files']);
     drupal_set_message(t('@count objects added to Bag.', array('@count' => count($results))));
   }
