@@ -331,8 +331,7 @@ function islandora_bagit_create_bag($islandora_object) {
   }
 
   // Sanitize the PID so it is usable in file paths.
-  // $pid = str_replace(array(':', '-'), '_', $islandora_object->id);
-  $pid = $islandora_object->id;
+  $pid = str_replace(array(':', '-'), '_', $islandora_object->id);
   // Save all the datastreams to a randomly named temporary directory so
   // they can be added to the Bag. We delete these files after creating the Bag.
   $random_string = substr(md5(rand()), 0, 7);
@@ -348,7 +347,7 @@ function islandora_bagit_create_bag($islandora_object) {
     require_once $bagit_library_path . '/lib/bagit.php';
   }
 
-  $bag_file_name = variable_get('islandora_bagit_bag_name', 'Bag-') . $pid;
+  $bag_file_name = variable_get('islandora_bagit_bag_name', 'Bag-') . $islandora_object->id;
   $bag_output_path = variable_get('islandora_bagit_bag_output_dir', '/tmp') .
     DIRECTORY_SEPARATOR . $bag_file_name;
 
@@ -595,7 +594,7 @@ function islandora_bagit_create_collection_bag_batch($islandora_object) {
     require_once $bagit_library_path . '/lib/bagit.php';
   }
 
-  $bag_file_name = variable_get('islandora_bagit_bag_name', 'Bag-') . $pid;
+  $bag_file_name = variable_get('islandora_bagit_bag_name', 'Bag-') . $islandora_object->id;
   $bag_output_path = variable_get('islandora_bagit_bag_output_dir', '/tmp') .
     DIRECTORY_SEPARATOR . $bag_file_name;
 
@@ -635,6 +634,7 @@ function islandora_bagit_create_collection_bag_batch($islandora_object) {
   islandora_bagit_serialize_bag_object($bag, $pid, $tmp_ds_directory);
   // We need the $pid in islandora_bagit_collection_batch_finish_bag().
   $_SESSION['islandora_bagit_collection_object_pid'] = $pid;
+  $_SESSION['islandora_bagit_collection_object_unchanged_pid'] = $islandora_object->id;
 
   // Iterate through all the objects and create an entry in $operations
   // for each one.
@@ -776,6 +776,7 @@ function islandora_bagit_collection_batch_finished($success, $results, $operatio
     // Clean up session variables added by the collection-level batch.
     unset($_SESSION['islandora_bagit_tmp_ds_directory']);
     unset($_SESSION['islandora_bagit_collection_object_pid']);
+    unset($_SESSION['islandora_bagit_collection_object_unchanged_pid'])
     unset($_SESSION['islandora_bagit_all_added_files']);
     drupal_set_message(t('@count objects added to Bag.', array('@count' => count($results))));
   }
@@ -806,10 +807,11 @@ function islandora_bagit_collection_batch_finished($success, $results, $operatio
  */
 function islandora_bagit_collection_batch_finish_bag() {
   $pid = $_SESSION['islandora_bagit_collection_object_pid'];
+  $unchanged_pid = $_SESSION['islandora_bagit_collection_object_unchanged_pid'];
   $tmp_ds_directory = $_SESSION['islandora_bagit_tmp_ds_directory'];
   $all_added_files = $_SESSION['islandora_bagit_all_added_files'];
 
-  $bag_file_name = variable_get('islandora_bagit_bag_name', 'Bag-') . $pid;
+  $bag_file_name = variable_get('islandora_bagit_bag_name', 'Bag-') . $unchanged_pid;
   $bag_output_path = variable_get('islandora_bagit_bag_output_dir', '/tmp') .
     DIRECTORY_SEPARATOR . $bag_file_name;
 
