@@ -1,3 +1,0 @@
-[submodule "plugins/PAW-plugin"]
-	path = plugins/PAW-plugin
-	url = git@github.com:WRLC/PAW-plugin.git
